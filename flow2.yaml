@@ -1,0 +1,32 @@
+id: CleansingData
+namespace: reyhan_de
+inputs:
+  - type: FILE
+    id: lazada
+tasks:
+
+  - id: pandas
+    type: io.kestra.plugin.scripts.python.Script
+    beforeCommands:
+      - pip install pandas
+    inputFiles:
+      input_csv: "{{}}"
+    script: import pandas as pd
+
+      df = pd.read_csv('https://github.com/msr120295/pretest-data-engineer/blob/main/review-lazada.csv')
+
+      print(df.head())
+      print(df.describe())
+      print(df.isnull().sum())
+
+
+      bad = df[(df['rating'] < 2)]
+      netral = df[(df['rating'] == 3)]
+      bagus= df[(df['rating'] > 3)]
+    outputFiles:
+      - "*.csv"
+
+  - id: hasil
+    type: io.kestra.plugin.scripts.shell.Commands
+    commands:
+      - head -n 5 {{ outputs.data_celan.outputFiles['data_celan.csv'] }}
